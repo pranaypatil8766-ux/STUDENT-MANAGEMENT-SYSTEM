@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* HEADER */
+        header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            padding: 25px;
+            text-align: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+
+        /* TABS */
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* FORM STYLING */
+        .form-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(8px);
+        }
+
+        .form-card h2 {
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 28px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .form-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 15px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.4);
+            outline: none;
+        }
+
+        .inline-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .gender-options {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+
+        .gender-options label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+        }
+
+        .gender-options input {
+            width: auto;
+            margin-right: 6px;
+        }
+
+        /* SUBJECT MARKS TABLE */
+        .marks-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .marks-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border: none;
+        }
+
+        .marks-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .marks-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .marks-table input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 0;
+        }
+
+        .marks-table input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        /* BUTTONS */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        button, input[type="submit"] {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reset {
+            background: #e0e0e0;
+            color: #333;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-reset:hover {
+            background: #d0d0d0;
+            transform: translateY(-2px);
+        }
+
+        .btn-add {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .btn-add:hover {
+            background: #218838;
+        }
+
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .btn-remove:hover {
+            background: #c82333;
+        }
+
+        /* RESULTS TABLE */
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results-table th {
+            background: #667eea;
+            color: white;
+            padding: 14px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .results-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .results-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 16px;
+        }
+
+        /* FOOTER */
+        footer {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            margin-top: 40px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .inline-group {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            header {
+                font-size: 24px;
+                padding: 18px;
+            }
+
+            .form-card {
+                padding: 20px;
+            }
+
+            .marks-table {
+                font-size: 13px;
+            }
+
+            .marks-table input {
+                padding: 6px;
+            }
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid #c3e6cb;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideDown 0.3s ease-in;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>📚 Student Management System</header>
+
+    <div class="container">
+        <!-- TAB BUTTONS -->
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('addStudent')">Add Student</button>
+            <button class="tab-btn" onclick="switchTab('addMarks')">Add Marks</button>
+            <button class="tab-btn" onclick="switchTab('viewRecords')">View Records</button>
+        </div>
+
+        <!-- TAB 1: ADD STUDENT -->
+        <div id="addStudent" class="tab-content active">
+            <div class="form-card">
+                <h2>Add New Student</h2>
+                <div class="success-message" id="successMsg1">✓ Student added successfully!</div>
+                
+                <form id="studentForm" onsubmit="addStudent(event)">
+                    <!-- Basic Information -->
+                    <div class="form-section">
+                        <h3>Basic Information</h3>
+                        
+                        <div class="form-group">
+                            <label for="studentName">Full Name:</label>
+                            <input type="text" id="studentName" name="studentName" required>
+                        </div>
+
+                        <div class="inline-group">
+                            <div class="form-group">
+                                <label for="studentAge">Age:</label>
+                                <input type="number" id="studentAge" name="studentAge" min="1" max="100" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentDOB">Date of Birth:</label>
+                                <input type="date" id="studentDOB" name="studentDOB" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Gender:</label>
+                            <div class="gender-options">
+                                <label><input type="radio" name="studentGender" value="Male" required> Male</label>
+                                <label><input type="radio" name="studentGender" value="Female"> Female</label>
+                                <label><input type="radio" name="studentGender" value="Other"> Other</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="form-section">
+                        <h3>Contact Information</h3>
+                        
+                        <div class="form-group">
+                            <label for="studentEmail">Email ID:</label>
+                            <input type="email" id="studentEmail" name="studentEmail" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentPhone">Mobile Number:</label>
+                            <input type="text" id="studentPhone" name="studentPhone" required>
+                        </div>
+                    </div>
+
+                    <!-- Academic Information -->
+                    <div class="form-section">
+                        <h3>Academic Information</h3>
+                        
+                        <div class="inline-group">
+                            <div class="form-group">
+                                <label for="studentRoll">Roll No:</label>
+                                <input type="text" id="studentRoll" name="studentRoll" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentClass">Class/Grade:</label>
+                                <input type="text" id="studentClass" name="studentClass" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentDivision">Division:</label>
+                            <select id="studentDivision" name="studentDivision" required>
+                                <option value="">-- Select Division --</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentAddress">Address:</label>
+                            <textarea id="studentAddress" name="studentAddress" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-submit">Add Student</button>
+                        <button type="reset" class="btn-reset">Clear Form</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB 2: ADD MARKS -->
+        <div id="addMarks" class="tab-content">
+            <div class="form-card">
+                <h2>Add Subject Marks</h2>
+                <div class="success-message" id="successMsg2">✓ Marks added successfully!</div>
+                
+                <form id="marksForm" onsubmit="addMarks(event)">
+                    <div class="form-section">
+                        <h3>Student Selection</h3>
+                        
+                        <div class="form-group">
+                            <label for="selectStudent">Select Student:</label>
+                            <select id="selectStudent" name="selectStudent" required>
+                                <option value="">-- Select a Student --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Subject Marks</h3>
+                        
+                        <table class="marks-table">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Marks (Out of 100)</th>
+                                    <th>Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody id="marksTableBody">
+                                <tr>
+                                    <td><input type="text" class="subject" placeholder="e.g., Mathematics" required></td>
+                                    <td><input type="number" class="marks" min="0" max="100" required></td>
+                                    <td><input type="text" class="grade" readonly></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <button type="button" class="btn-add" onclick="addSubjectRow()">+ Add Another Subject</button>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-submit">Save Marks</button>
+                        <button type="reset" class="btn-reset">Clear Form</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB 3: VIEW RECORDS -->
+        <div id="viewRecords" class="tab-content">
+            <div class="form-card">
+                <h2>Student Records</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <input type="text" id="searchInput" placeholder="Search by name or roll number..." style="padding: 12px; border: 2px solid #ddd; border-radius: 6px; width: 100%; font-size: 14px;">
+                </div>
+
+                <h3 style="color: #667eea; margin: 20px 0 15px 0;">Student List</h3>
+                <div id="studentRecords" class="no-data">No students added yet. Add a student first.</div>
+
+                <h3 style="color: #667eea; margin: 30px 0 15px 0;">Student Marks</h3>
+                <div id="marksRecords" class="no-data">No marks added yet. Add marks for students.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        © 2025 Student Management System | All Rights Reserved
+    </footer>
+
+    <script>
+        // Initialize localStorage
+        function initializeData() {
+            if (!localStorage.getItem('students')) {
+                localStorage.setItem('students', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('marks')) {
+                localStorage.setItem('marks', JSON.stringify([]));
+            }
+        }
+
+        // Add Student
+        function addStudent(event) {
+            event.preventDefault();
+            
+            const student = {
+                id: Date.now(),
+                name: document.getElementById('studentName').value,
+                age: document.getElementById('studentAge').value,
+                dob: document.getElementById('studentDOB').value,
+                gender: document.querySelector('input[name="studentGender"]:checked').value,
+                email: document.getElementById('studentEmail').value,
+                phone: document.getElementById('studentPhone').value,
+                roll: document.getElementById('studentRoll').value,
+                class: document.getElementById('studentClass').value,
+                division: document.getElementById('studentDivision').value,
+                address: document.getElementById('studentAddress').value
+            };
+
+            let students = JSON.parse(localStorage.getItem('students'));
+            students.push(student);
+            localStorage.setItem('students', JSON.stringify(students));
+
+            document.getElementById('studentForm').reset();
+            showSuccessMessage('successMsg1');
+            updateStudentDropdown();
+            displayStudentRecords();
+        }
+
+        // Update Student Dropdown
+        function updateStudentDropdown() {
+            const students = JSON.parse(localStorage.getItem('students'));
+            const dropdown = document.getElementById('selectStudent');
+            dropdown.innerHTML = '<option value="">-- Select a Student --</option>';
+            
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.text = `${student.name} (${student.roll})`;
+                dropdown.appendChild(option);
+            });
+        }
+
+        // Add Subject Row
+        function addSubjectRow() {
+            const tbody = document.getElementById('marksTableBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="subject" placeholder="e.g., Mathematics" required></td>
+                <td><input type="number" class="marks" min="0" max="100" required oninput="calculateGrade(this)"></td>
+                <td><input type="text" class="grade" readonly></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        // Calculate Grade
+        function calculateGrade(input) {
+            const marks = parseInt(input.value) || 0;
+            const grade = input.parentElement.parentElement.querySelector('.grade');
+            
+            if (marks >= 90) grade.value = 'A+';
+            else if (marks >= 80) grade.value = 'A';
+            else if (marks >= 70) grade.value = 'B+';
+            else if (marks >= 60) grade.value = 'B';
+            else if (marks >= 50) grade.value = 'C';
+            else grade.value = 'F';
+        }
+
+        // Add Marks
+        function addMarks(event) {
+            event.preventDefault();
+
+            const studentId = document.getElementById('selectStudent').value;
+            if (!studentId) {
+                alert('Please select a student');
+                return;
+            }
+
+            const marksData = {
+                id: Date.now(),
+                studentId: studentId,
+                subjects: []
+            };
+
+            const rows = document.querySelectorAll('#marksTableBody tr');
+            rows.forEach(row => {
+                const subject = row.querySelector('.subject').value;
+                const marks = row.querySelector('.marks').value;
+                const grade = row.querySelector('.grade').value;
+
+                if (subject && marks) {
+                    marksData.subjects.push({ subject, marks, grade });
+                }
+            });
+
+            if (marksData.subjects.length === 0) {
+                alert('Please add at least one subject with marks');
+                return;
+            }
+
+            let marksArray = JSON.parse(localStorage.getItem('marks'));
+            marksArray.push(marksData);
+            localStorage.setItem('marks', JSON.stringify(marksArray));
+
+            document.getElementById('marksForm').reset();
+            const tbody = document.getElementById('marksTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td><input type="text" class="subject" placeholder="e.g., Mathematics" required></td>
+                    <td><input type="number" class="marks" min="0" max="100" required oninput="calculateGrade(this)"></td>
+                    <td><input type="text" class="grade" readonly></td>
+                </tr>
+            `;
+            showSuccessMessage('successMsg2');
+            displayMarksRecords();
+        }
+
+        // Display Student Records
+        function displayStudentRecords() {
+            const students = JSON.parse(localStorage.getItem('students'));
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const recordDiv = document.getElementById('studentRecords');
+
+            const filtered = students.filter(s => 
+                s.name.toLowerCase().includes(searchTerm) || 
+                s.roll.toLowerCase().includes(searchTerm)
+            );
+
+            if (filtered.length === 0) {
+                recordDiv.innerHTML = '<div class="no-data">No students found.</div>';
+                return;
+            }
+
+            let html = '<table class="results-table"><thead><tr><th>Name</th><th>Roll No</th><th>Class</th><th>Email</th><th>Phone</th><th>Action</th></tr></thead><tbody>';
+            
+            filtered.forEach(student => {
+                html += `
+                    <tr>
+                        <td>${student.name}</td>
+                        <td>${student.roll}</td>
+                        <td>${student.class} - ${student.division}</td>
+                        <td>${student.email}</td>
+                        <td>${student.phone}</td>
+                        <td><button class="delete-btn" onclick="deleteStudent(${student.id})">Delete</button></td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            recordDiv.innerHTML = html;
+        }
+
+        // Display Marks Records
+        function displayMarksRecords() {
+            const marks = JSON.parse(localStorage.getItem('marks'));
+            const students = JSON.parse(localStorage.getItem('students'));
+            const recordDiv = document.getElementById('marksRecords');
+
+            if (marks.length === 0) {
+                recordDiv.innerHTML = '<div class="no-data">No marks added yet.</div>';
+                return;
+            }
+
+            let html = '<table class="results-table"><thead><tr><th>Student Name</th><th>Roll No</th><th>Subject</th><th>Marks</th><th>Grade</th><th>Action</th></tr></thead><tbody>';
+            
+            marks.forEach(mark => {
+                const student = students.find(s => s.id == mark.studentId);
+                if (student) {
+                    mark.subjects.forEach(subject => {
+                        html += `
+                            <tr>
+                                <td>${student.name}</td>
+                                <td>${student.roll}</td>
+                                <td>${subject.subject}</td>
+                                <td>${subject.marks}</td>
+                                <td><strong>${subject.grade}</strong></td>
+                                <td><button class="delete-btn" onclick="deleteMarks(${mark.id})">Delete</button></td>
+                            </tr>
+                        `;
+                    });
+                }
+            });
+
+            html += '</tbody></table>';
+            recordDiv.innerHTML = html;
+        }
+
+        // Delete Student
+        function deleteStudent(id) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                let students = JSON.parse(localStorage.getItem('students'));
+                students = students.filter(s => s.id !== id);
+                localStorage.setItem('students', JSON.stringify(students));
+                
+                // Also remove associated marks
+                let marks = JSON.parse(localStorage.getItem('marks'));
+                marks = marks.filter(m => m.studentId != id);
+                localStorage.setItem('marks', JSON.stringify(marks));
+                
+                updateStudentDropdown();
+                displayStudentRecords();
+                displayMarksRecords();
+            }
+        }
+
+        // Delete Marks
+        function deleteMarks(id) {
+            if (confirm('Are you sure you want to delete these marks?')) {
+                let marks = JSON.parse(localStorage.getItem('marks'));
+                marks = marks.filter(m => m.id !== id);
+                localStorage.setItem('marks', JSON.stringify(marks));
+                displayMarksRecords();
+            }
+        }
+
+        // Switch Tabs
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-btn');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'viewRecords') {
+                displayStudentRecords();
+                displayMarksRecords();
+            }
+        }
+
+        // Show Success Message
+        function showSuccessMessage(messageId) {
+            const msg = document.getElementById(messageId);
+            msg.classList.add('show');
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 3000);
+        }
+
+        // Search Functionality
+        document.getElementById('searchInput')?.addEventListener('input', displayStudentRecords);
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            initializeData();
+            updateStudentDropdown();
+        });
+    </script>
+
+</body>
+</html>
